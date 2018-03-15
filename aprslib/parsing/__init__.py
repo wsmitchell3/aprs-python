@@ -44,6 +44,25 @@ from aprslib.parsing.telemetry import *
 from aprslib.parsing.thirdparty import *
 from aprslib.parsing.weather import *
 
+unsupported_formats = {
+        '#':'raw weather report',
+        '$':'raw gps',
+        '%':'agrelo',
+        '&':'reserved',
+        '(':'unused',
+        ')':'item report',
+        '*':'complete weather report',
+        '+':'reserved',
+        '-':'unused',
+        '.':'reserved',
+        '<':'station capabilities',
+        '?':'general query format',
+        'T':'telemetry report',
+        '[':'maidenhead locator beacon',
+        '\\':'unused',
+        ']':'unused',
+        '^':'unused',
+}
 
 def _unicode_packet(packet):
     # attempt utf-8
@@ -139,31 +158,8 @@ def parse(packet):
 def _try_toparse_body(packet_type, body, parsed):
     result = {}
 
-    # NOT SUPPORTED FORMATS
-    #
-    # # - raw weather report
-    # $ - raw gps
-    # % - agrelo
-    # & - reserved
-    # ( - unused
-    # ) - item report
-    # * - complete weather report
-    # + - reserved
-    # - - unused
-    # . - reserved
-    # < - station capabilities
-    # ? - general query format
-    # T - telemetry report
-    # [ - maidenhead locator beacon
-    # \ - unused
-    # ] - unused
-    # ^ - unused
-    # } - 3rd party traffic
-    if packet_type in '#$%)*<?T[':
-        raise UnknownFormat("format is not supported")
-
     # 3rd party traffic
-    elif packet_type == '}':
+    if packet_type == '}':
         logger.debug("Packet is third-party")
         body, result = parse_thirdparty(body)
 
@@ -208,6 +204,14 @@ def _try_toparse_body(packet_type, body, parsed):
           0 <= body.find('!') < 40):  # page 28 of spec (PDF)
 
         body, result = parse_position(packet_type, body)
+
+    # other data types
+    elif packet_type in unsupported_formats:
+        raise UnknownFormat('format is not supported: {0}'.format(unsupported_formats[packet_type]))
+
+    else:
+        raise UnknownFormat('format is not supported')
+
 
     # we are done
     parsed.update(result)
