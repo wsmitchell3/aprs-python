@@ -54,5 +54,5 @@ class thirdpartyTC(unittest.TestCase):
         self.assertEqual(result['subpacket']['response'],'ack')
         self.assertEqual(result['subpacket']['format'],'message')
         self.assertEqual(result['subpacket']['to'],'APU25N')
-        self.assertEqual(result['subpacket']['addresse'],'DEF')
+        self.assertEqual(result['subpacket']['addressee'],'DEF')
 
