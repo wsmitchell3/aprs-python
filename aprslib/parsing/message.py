@@ -53,14 +53,14 @@ def parse_message(body):
                 })
             break
 
-        # validate addresse
+        # validate addressee
         match = re.findall(r"^([a-zA-Z0-9_ \-]{9}):(.*)$", body)
         if not match:
             break
 
-        addresse, body = match[0]
+        addressee, body = match[0]
 
-        parsed.update({'addresse': addresse.rstrip(' ')})
+        parsed.update({'addressee': addressee.rstrip(' ')})
 
         # check if it's a telemetry configuration message
         body, result = parse_telemetry_config(body)
