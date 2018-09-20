@@ -51,7 +51,12 @@ def parse_mice(dstcall, body):
         raise ParseError("invalid dstcall")
     if not re.match(r"^[&-\x7f][&-a][\x1c-\x7f]{2}[\x1c-\x7d]"
                     r"[\x1c-\x7f][\x21-\x7e][\/\\0-9A-Z]", body):
-        raise ParseError("invalid data format")
+        if not re.match(r"^[&-\x7f][&-a][\x1c-\x7f]{2}[\x1c-\x7d]"
+                                r"[\x1c-\x7f][\x21-\x7e][\/\\0-9A-Z]", re.sub(r"<0x([0-9A-Fa-f]{2})>", r"\x\1", body)):
+            raise ParseError("invalid data format")
+        else:
+            body = re.sub(r"<0x([0-9A-Fa-f]{2})>", r"\x\1", body)
+
 
     # get symbol table and symbol
     parsed.update({
